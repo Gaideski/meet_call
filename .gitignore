@@ -133,3 +133,4 @@ dmypy.json
 *.png
 *.jpeg
 *.webp
+!CallTemplate.png
