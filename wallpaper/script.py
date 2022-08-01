@@ -111,8 +111,8 @@ unlock = unlock[cy-desiredHeight:cy +
 unlock = crop_circular_mask(unlock, meet_background)
 
 # WRITE NAMES INTO IMAGES
-unlock = write_text(unlock, call_name, unlock_writing_pos, 16)
-template = write_text(template, os.path.splitext(random_guest)[0], name_position, 22)
+unlock = write_text(unlock, call_name.capitalize(), unlock_writing_pos, 16)
+template = write_text(template, os.path.splitext(random_guest)[0].capitalize(), name_position, 22)
 
 # FIT ACTUAL CALL INTO TEMPLATE
 template[unlock_pos[0]:(unlock_pos[0]+unlock.shape[0]), unlock_pos[1]:(unlock_pos[1]+unlock.shape[1])] = unlock
