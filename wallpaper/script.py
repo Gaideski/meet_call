@@ -6,6 +6,7 @@ import random
 import json
 from PyWallpaper import change_wallpaper
 
+
 def write_text(img, text, position, size):
     # Convert the image to RGB (OpenCV uses BGR)
     img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
@@ -15,7 +16,8 @@ def write_text(img, text, position, size):
 
     draw = ImageDraw.Draw(pil_im)
     # use a truetype font
-    font1 = ImageFont.truetype("wallpaper/resources/Product Sans Regular.ttf", size)
+    font1 = ImageFont.truetype(
+        "wallpaper/resources/Product Sans Regular.ttf", size)
 
     # Draw the text
     draw.text(position, text, font=font1)
@@ -43,12 +45,24 @@ def crop_circular_mask(image, background_color, diag_percent=1.56):
     return image
 
 
+def fit_guest(image):
+    image_ratio = image.shape[1]/image.shape[0]
+    if image_ratio >= 1:
+        image = cv.resize(image, guest_resolution)
+    else:
+        width_diff = int(((image.shape[0]-image.shape[1])*1.8//2))
+        image = cv.copyMakeBorder(
+            image, 0, 0, width_diff, width_diff, cv.BORDER_REPLICATE)
+        image = cv.resize(image, guest_resolution)
+    return image
+
+
 config = None
 with open('wallpaper/conf.json') as f:
     config = json.load(f)
 
-
-template = cv.imread('wallpaper/template/CallTemplate.png')
+template = cv.imread('wallpaper/template/' +
+                     random.choice(os.listdir('wallpaper/template')))
 unlock = None
 
 call_name = config['custom_call_name']
@@ -57,10 +71,11 @@ if not call_name:
 # RELATIVE NAME POSITIONS
 name_position = (60, 964)
 miniature_pos = (1777, 42)  # X(1777:1801) Y(4s2:64)
-unlock_pos = (349,1395)
-guest_pos = (176,12)
-unlock_writing_pos = (20,390)
+unlock_pos = (349, 1395)
+guest_pos = (176, 12)
+unlock_writing_pos = (20, 390)
 miniature_resolution = (24, 24)
+guest_resolution = (1369, 780)
 
 # BACKGROUND_COLORS
 meet_background = [36, 33, 32]
@@ -84,7 +99,6 @@ random_guest = random.choice(os.listdir('wallpaper/guest'))
 guest = cv.imread('wallpaper/guest/'+random_guest)
 
 
-
 # POSITION TO REPLACE CALL IMAGE
 desiredWidth = 510//2
 desiredHeight = 424//2
@@ -97,8 +111,9 @@ miniature = cv.resize(miniature, miniature_resolution)
 miniature = crop_circular_mask(miniature, chrome_backround, 2)
 
 # RESIZE AND FIT guestIST IMAGE TO TEMPLATE
-guest = cv.resize(guest, (1369, 780))
-template[guest_pos[0]:(guest_pos[0]+guest.shape[0]), guest_pos[1]:(guest_pos[1]+guest.shape[1])] = guest
+guest = fit_guest(guest)
+template[guest_pos[0]:(guest_pos[0]+guest.shape[0]),
+         guest_pos[1]:(guest_pos[1]+guest.shape[1])] = guest
 
 # CLEAR OLD NAMEPLATE FROM TEMPLATE IMAGE
 nameplate = np.ones((20, 130, 3))
@@ -112,15 +127,17 @@ unlock = crop_circular_mask(unlock, meet_background)
 
 # WRITE NAMES INTO IMAGES
 unlock = write_text(unlock, call_name.capitalize(), unlock_writing_pos, 16)
-template = write_text(template, os.path.splitext(random_guest)[0].capitalize(), name_position, 22)
+template = write_text(template, os.path.splitext(
+    random_guest)[0].capitalize(), name_position, 22)
 
 # FIT ACTUAL CALL INTO TEMPLATE
-template[unlock_pos[0]:(unlock_pos[0]+unlock.shape[0]), unlock_pos[1]:(unlock_pos[1]+unlock.shape[1])] = unlock
+template[unlock_pos[0]:(unlock_pos[0]+unlock.shape[0]),
+         unlock_pos[1]:(unlock_pos[1]+unlock.shape[1])] = unlock
 template[miniature_pos[1]:(miniature_pos[1]+miniature.shape[0]),
          miniature_pos[0]:(miniature_pos[0]+miniature.shape[1])] = miniature
 
-cv.imwrite('wallpaper/perdeu.png',template)
+cv.imwrite('wallpaper/perdeu.png', template)
 change_wallpaper(os.path.abspath('wallpaper/perdeu.png'))
-#set_wallpaper(os.path.abspath('perdeu.png'))
+# set_wallpaper(os.path.abspath('perdeu.png'))
 #cv.imshow('Fonts', template)
-#cv.waitKey(0)
+# cv.waitKey(0)
