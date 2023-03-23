@@ -26,5 +26,6 @@ elif system() == "Linux":
 		else:
 			def change_wallpaper(uri):
 				s('gsettings set org.gnome.desktop.background picture-uri "file://{0}"'.format(uri))
+				s('gsettings set org.gnome.desktop.background picture-uri-dark "file://{0}"'.format(uri))
 	except:
 		raise OSError("Wallaper Change is supported in GNOME 2/3 and Unity only")

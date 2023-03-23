@@ -129,8 +129,10 @@ dmypy.json
 .pyre/
 
 # Images
+
 *.jpg
 *.png
 *.jpeg
 *.webp
 !CallTemplate.png
+!Example.jpg
